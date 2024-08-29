@@ -1,4 +1,4 @@
-# A Haskell tour on side-effects: Part 4, ReaderT design pattern
+# A Haskell tour on side-effects: Part 5, ReaderT design pattern
 
 In this alternative we are going to iterate a bit on what we did before. We are going to keep our functions writen in terms of a generic monad which allows switching the actual implementation for tests. But we are going to move the `BookDB` value out of the function argument into an implicit state. We are going to do so by implementing the [ReaderT design pattern](https://tech.fpcomplete.com/blog/2017/06/readert-design-pattern/).
 

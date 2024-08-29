@@ -4,7 +4,13 @@ This is a sample project to compare how side-effects can be managed and tested i
 
 Each alternative has it's own `app<N>` and `test<N>` project, and they all share common library code from `src`.
 
-You can start the tour by reading [./docs/01-Intro.md](./docs/01-Intro.md).
+There are some docs describing each alternative
+
+* [Part 1, Introduction](./docs/01-Intro.md)
+* [Part 2, Console Handler](./docs/02-Console-Handler.md)
+* [Part 3, Task](./docs/03-Task.md)
+* [Part 4, Type Classes](./docs/04-Type-Classes.md)
+* [Part 5, ReaderT design pattern](./docs/05-ReaderT.md)
 
 ## Alternatives
 
@@ -14,13 +20,14 @@ You can start the tour by reading [./docs/01-Intro.md](./docs/01-Intro.md).
 - **app4** uses custom type classes to restrict other side-effects from happening.
 - **app5** similar to `app4` but using `ReaderT` to keep the application state
 
-**TBD**
+### Additional alternatives based on packages
 
-- **app??** similar to `app2` and `app3` but uses `bluefin` package as a type level alternative of the handler pattern.
-- **app??** similar to `app5` but uses `Capabilities` package
-- **app??** effectfull
-- **app??** polysemy
-- **app??** free monads
+- **app-bluefin** similar to `app2` and `app3` but uses [`bluefin`](https://hackage.haskell.org/package/bluefin) package as a type level alternative of the handler pattern.
+- 🚧 **app-effectful** uses [`effectful`](https://hackage.haskell.org/package/effectful)
+  - TBD tests
+- 🚧 **app-polysemy**
+- ❌ ~~**app-capabilities** similar to `app5` but uses `Capabilities` package~~.
+  - ❌ [`Capabilities`](https://hackage.haskell.org/package/Capabilities) packages only works for `base >= 4.5 && 4.6`. We are using 4.17. I wanted to try it out based on [its blog post](https://www.tweag.io/blog/2018-10-04-capability/)
 
 ## Running the code
 
