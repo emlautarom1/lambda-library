@@ -1,0 +1,129 @@
+cabal-version:      3.0
+name:               lambda-library
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            MIT
+license-file:       LICENSE
+author:             Brian J. Cardiff
+maintainer:         bcardiff@gmail.com
+-- copyright:
+build-type:         Simple
+-- extra-doc-files:
+-- extra-source-files:
+
+common warnings
+    ghc-options: -Wall
+
+common defaults
+    default-extensions: 
+        OverloadedStrings,
+        OverloadedRecordDot
+    build-depends:
+        base ^>=4.17.2.1
+    default-language: GHC2021
+
+common app
+    import:           defaults
+    build-depends:
+        lambda-library
+
+common app-test
+    import:           defaults
+    ghc-options: -main-is Test
+    other-modules:
+        Main
+    build-depends:
+        lambda-library,
+        hspec >= 2.11.9 && < 2.12
+
+library
+    import:           warnings, defaults
+    exposed-modules:
+        Books
+    build-depends:
+        sqlite-simple >= 0.4.19 && < 0.5
+
+    hs-source-dirs:   src
+
+executable app1
+    import:           warnings, app
+    main-is:          Main.hs
+    hs-source-dirs:   app1
+
+test-suite app1-test
+    import:           warnings, app-test
+    type:             exitcode-stdio-1.0
+    main-is:          Test.hs
+    hs-source-dirs:   app1, app1-test
+    other-modules:
+        Support
+    build-depends:
+        bytestring >= 0.11.5 && < 0.12, 
+        utf8-string >= 1.0.2 && < 1.1, 
+        main-tester >= 0.2.0 && < 0.3
+
+executable app2
+    import:           warnings, app
+    main-is:          Main.hs
+    hs-source-dirs:   app2
+
+test-suite app2-test
+    import:           warnings, app-test
+    type:             exitcode-stdio-1.0
+    main-is:          Test.hs
+    hs-source-dirs:   app2, app2-test
+    other-modules:
+        Support
+
+executable app3
+    import:           warnings, app
+    main-is:          Main.hs
+    hs-source-dirs:   app3
+    other-modules:
+        Task
+
+test-suite app3-test
+    import:           warnings, app-test
+    type:             exitcode-stdio-1.0
+    main-is:          Test.hs
+    hs-source-dirs:   app3, app3-test
+    other-modules:
+        Support
+        Task
+
+executable app4
+    import:           warnings, app
+    main-is:          Main.hs
+    hs-source-dirs:   app4
+
+test-suite app4-test
+    import:           warnings, app-test
+    type:             exitcode-stdio-1.0
+    main-is:          Test.hs
+    hs-source-dirs:   app4, app4-test
+    build-depends:
+        mtl >= 2.2.2 && < 2.3
+    other-modules:
+        Support
+        Result
+
+executable app5
+    import:           warnings, app
+    main-is:          Main.hs
+    hs-source-dirs:   app5
+    other-modules:
+        App
+    build-depends:
+        mtl >= 2.2.2 && < 2.3
+
+test-suite app5-test
+    import:           warnings, app-test
+    type:             exitcode-stdio-1.0
+    main-is:          Test.hs
+    hs-source-dirs:   app5, app5-test
+    build-depends:
+        mtl >= 2.2.2 && < 2.3
+    other-modules:
+        Support
+        App
