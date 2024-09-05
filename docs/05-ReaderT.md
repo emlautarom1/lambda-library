@@ -10,14 +10,14 @@ class (Monad m) => HasConsole m where
   printLine :: String -> m ()
 ```
 
-For performing the book search we are going to define a `HasReadOnlyBookDB` monad with a `findBook` that takes only the search query and returns a (monadic) list of books as results.
+For performing the book search we are going to define a `HasReadOnlyBookDB` monad with a `findBook` that takes only the search query and returns a (monadic) list of books as result.
 
 ```haskell
 class (Monad m) => HasReadOnlyBookDB m where
   findBook :: String -> m [Book]
 ```
 
-Where is the `BookDB`? It will appear soon. Before looking into it, we can implement the rest functions.
+Where is the `BookDB`? It will appear soon. Before looking into it, we can implement the rest of the functions.
 The `main'` and `loop` function takes no argumetns since the `BookDB` is going to be implicit now. The implemention is mostly like the previous alternative.
 
 ```haskell
@@ -48,7 +48,7 @@ printBookList books =
 
 Where things differ from just using type classes and this alternative is that the monad that we are going to use for the production code is no longer `IO` but something else. It's going to be a `ReaderT` over and `Env` that will keep the implicit state (the `BookDB`) and the `IO` monad.
 
-We can choose to use `ReaderT` directly but I prefer a different type to track better where is used, but also be able to restrict whether we want `MonadIO` or `MonadFail` for example.
+We can choose to use `ReaderT` directly but I prefer a different opaque type to track better where is used, and also to be able to restrict whether we want `MonadIO` or `MonadFail` for example.
 
 ```haskell
 {-# LANGUAGE GeneralisedNewtypeDeriving #-}
@@ -166,6 +166,8 @@ instance HasReadOnlyBookDB TestApp where
     liftIO $ Books.findBook db' q
 ```
 
-`ReaderT` design pattern is a more precise usage of type classes. Having implicit context via `Env` and working with `IO`/`MonadIO` offers better ergonomics than the handler pattern with `Task`. But the handler pattern is built on simpler concepts. 
+`ReaderT` design pattern is a more precise usage of type classes. Having implicit context via `Env` and working with `IO`/`MonadIO` offers better ergonomics than the handler pattern with `Task`. But the handler pattern is built on simpler concepts.
+
+As a reminder, although our `App` implements `MonadIO`, we restrict additional side-effects from happening because the `main'`, `loop`, `printBookList` functions don't use `App` directly but the type classes that don't have `MonadIO`.
 
 > [!note] You can find a working copy of this code in `app5` and `app5-test` in [github:bcardiff/lambda-library](https://github.com/bcardiff/lambda-library)

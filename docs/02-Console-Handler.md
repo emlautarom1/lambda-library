@@ -43,7 +43,7 @@ loop = _
 
 Thanks to [`OverloadedRecordDot`](https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/overloaded_record_dot.html) we write `c.printLine "Welcome to the Library"` instead of `printLine c "Welcome to the Library"` which plays particularly nice in this case since the functions to execute are values defined in the `ConsoleHandler` itself.
 
-The `loop` implementation needs to be adapted as well to use `ConsoleHandler`.
+The `loop` implementation needs to be adapted as well to use a `ConsoleHandler`.
 
 ```haskell
 loop :: ConsoleHandler -> BookDB -> IO ()
@@ -102,7 +102,7 @@ main = hspec $ do
 
 But the `mockConsoleHandler` does not allow us to assert exactly when the calls to `printLine` happen with respect `getStringInput`. This is not ideal.
 
-This is a limitation of the implementation choice of the _mock handler_. We can choose to implement something more expressive for this case. Sometimese simpler mocks are enough, but not this time.
+This is a limitation of the implementation choice of the _mock handler_. We can choose to implement something more expressive for this case. Sometimes simpler mocks are enough, but not this time.
 
 One option is to create a mock handler that will allow only a strict order of calls, and that will know what to return for each. Like having a tape of the exact interaction we expect and using that tape for the test.
 

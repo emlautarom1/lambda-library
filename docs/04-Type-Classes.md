@@ -35,7 +35,7 @@ instance HasConsole IO where
 
 And for tests we are going to provide another instance in a bit. But first let's write the full library search program.
 
-If apply the same recipe of putting the functions that we want in a type class for a generic monad we will end up with `CanReadBookDB`.
+If we apply the same recipe of putting the functions that we want in a type class for a generic monad we will end up with `CanReadBookDB`.
 
 ```haskell
 class (Monad m) => CanReadBookDB m where
@@ -44,7 +44,7 @@ class (Monad m) => CanReadBookDB m where
 
 For now we are going to stick with it, but later we are going to improve things. The reason for the eventual change is that we can't do much with a `BookDB` if we are not in a `IO`, yet we want a generic monad for `CanReadBookDB`.
 
-So an implementation of `CanReadBookDB` for `IO` that will be used in the real program is just a forward to the existing `Book.findBook` function.
+An implementation of `CanReadBookDB` for `IO` that will be used in the real program is just a forward to the existing `Book.findBook` function.
 
 ```haskell
 instance CanReadBookDB IO where
@@ -167,9 +167,9 @@ Once the above functions are implemeted mostly by using `get` and `put` to acces
         (main' undefined)
 ```
 
-You might have noticied the odd `undefined`. Since tests using `TestApp` will not perform `IO` we don't need an actual `BookDB` value, hence using `undefined` is fine. Again, in the next alternative we are gonig to improve this.
+You might have noticied the odd `undefined`. Since tests using `TestApp` will not perform `IO` we don't need an actual `BookDB` value, hence using `undefined` is fine. In the next alternative we are gonig to improve this.
 
-We also mentioned that for tests we could use `IO`. To keep the `IORef` as we did for the handlers before we are going to need `ReaderT` from `mtl`.
+We also mentioned that for tests we could use `IO`. To keep the `IORef` as we did for the handlers we are going to need `ReaderT` from `mtl`.
 
 ```haskell
 newtype TestAppIO a = TestAppIO (ReaderT (IORef [ConsoleTapeEntry]) IO a)
@@ -217,7 +217,7 @@ instance (Monad m, MonadIO m) => CanReadBookDB m where
   findBook db q = liftIO $ Book.findBook db q
 ```
 
-Finally the specs looks very similar to the handler pattern. The main difference, as with `main'` is that we no longer need to pass explict `ConsoleHandler`.
+Finally, the specs looks very similar to the handler pattern. The main difference, as with `main'` is that we no longer need to pass an explict `ConsoleHandler`.
 
 ```haskell
     around (withDB ":memory:") $ do

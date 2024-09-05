@@ -5,7 +5,7 @@ We are going to develop a small application for users to search books within a l
 The application will open a connection to a database, wait for user input, perform a search
 and repeat, until the user input is empty and exit.
 
-A session could looks as follow:
+A session in this application could look as follow:
 
 ```
 Welcome to the Library
@@ -24,8 +24,10 @@ We are going to focus on how to perform the side-effects. How can we structure t
 and how we can write tests. We are going to go through different implementations of this
 same program to have a better understanding of the alternatives.
 
-We will assume there interation with the database is already in place. In particular we
-will have an implementation with SQLite, but that will not show up in this tour.
+We want to focus on how each alternative feel and looks like. This tour is not aim to propose that either solutions is better than other but to experience the difference between them.
+
+We will assume the interation with the database is already in place. In particular we
+will have an implementation with SQLite, but that will not show up through the tour.
 
 The `Books` module will expose functions to open and close a DB, and to add and find books.
 
@@ -47,7 +49,7 @@ withDB :: FilePath -> (BookDB -> IO ()) -> IO ()
 The `withDB` function will open and close a DB using [`bracket`](https://hackage.haskell.org/package/base-4.17.2.1/docs/Control-Exception.html#v:bracket).
 
 To be able to interact with the console for getting user input, printing strings and list of books
-we will need a couple of functions. Their actual implementation doesn't matter much to us, similar 
+we will need a couple of functions. Their actual implementation doesn't matter much, similar 
 to the `Book` module. The important thing to notice is that they return `IO a`.
 
 ```haskell
@@ -84,13 +86,11 @@ loop db = do
       loop db  
 ```
 
-The `main` that will open a fixed DB, present itself and start the loop of asking user input and reacting to it.
-
-> [!note] The code uses `OverloadedRecordDot` to write `db.findBook query` instead of `findBook db query`.
+The `main` will open a fixed DB, present itself and start the loop of asking user input and reacting to it.
 
 And this is a fully working example of what we want. But if we aim to write some tests we face a couple of challenges.
 
-Althought the `loop` receives a `BookDB`, we can't change the DB for the whole `main`. We leave `main` to only setup the database connection and move the whole application logic into a `main'` function. This way we will be able to write tests for `main'` and be un total control of which DB to use for each test.
+Althought the `loop` receives a `BookDB`, we can't change the DB for the whole `main`. We make `main` only setup the database connection and move the whole application logic into a `main'` function. This way, we will be able to write tests for `main'` and be in total control of which DB to use for each test.
 
 ```haskell
 main :: IO ()
@@ -186,7 +186,7 @@ A more precise test would be one that allow us to express in which order the use
         ]
 ```
 
-Achieving that requires some fine control of STDIN and STDOUT. Let's move on an restructure a bit our application
+Achieving that requires some fine control of STDIN and STDOUT. Let's move on and restructure a bit our application
 to allow simpler ways of testing it and see what other gains we can get.
 
 > [!note] You can find a working copy of this code in `app1` and `app1-test` in [github:bcardiff/lambda-library](https://github.com/bcardiff/lambda-library)

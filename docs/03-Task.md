@@ -27,9 +27,9 @@ data ConsoleHandler = ConsoleHandler
   }
 ```
 
-Under the hood a `Task` needs to perform some `IO`. But as long as there are no functions that returns a `Task` directly like `removeFile :: Task ()` we are going to be able to restrict side-effects. How? By using always a handler to get the `Task`.
+Under the hood a `Task` needs to perform some `IO`. But as long as there are no functions that returns a `Task` directly like `removeFile :: Task ()` we are going to be able to restrict side-effects. How? Becauser we will always need a handler to get a `Task`.
 
-This also meas that our `findBook :: BookDB -> String -> IO [Book]` does is not going to work direclty. Yet that function could be provided by a package that we are in no control. We need a handler to interact in a controlled way with the DB. Bonus we make that handle to perform read-only operations in the DB. 
+This also means that our `findBook :: BookDB -> String -> IO [Book]` is not going to work direclty. Yet that function could be provided by a package that we are in no control. We need a handler to interact in a controlled way with the DB. Bonus we can make that handle to perform read-only operations in the DB. 
 
 ```haskell
 newtype ReadOnlyBookDBHandler = ReadOnlyBookDBHandler
@@ -87,7 +87,7 @@ main = do
 
 The `Task.perform :: Task a -> IO a` function will actually execute the `Task`. 
 
-Again, since all the `Task` values that perform side-effects are created from handlers we are certain that `main'` will no perform unwanted side-effects.
+Again, since all the `Task` values that perform side-effects are created from handlers we are certain that `main'` will no perform unwanted side-effects. But `main` is able to use all the power of `IO` directly.
 
 Now, how we define `Task`? It's going to be an opaque type that implements `Monad`.
 
@@ -95,6 +95,7 @@ Now, how we define `Task`? It's going to be an opaque type that implements `Mona
 {-# LANGUAGE GeneralisedNewtypeDeriving #-}
 
 module Task ( Task, perform )
+
 newtype Task a = Task {run :: IO a}
   deriving (Functor, Applicative, Monad, MonadFail)
   
@@ -118,7 +119,7 @@ doAnythingHandler :: IO DoAnythingHandler
 doAnything :: DoAnythingHandler -> IO a -> Task a
 ```
 
-A `DoAnythingHandler` value can _only_ be obtained from the `doAnythingHandler` function which returns an `IO`. So, we can't call it from a `Task`, only from an `IO.
+A `DoAnythingHandler` value can _only_ be obtained from the `doAnythingHandler` function which returns an `IO`. So, we can't call it from a `Task`, only from an `IO`.
 
 Then we can convert an `IO` to a `Task` using `doAnything` that requires a `DoAnythingHandler` value.
 
@@ -162,9 +163,9 @@ readOnlyBookDBHandler db = do
 
 Let's take a look at the test in this alternative. The handlers allow us to change the `ConsoleHandler` but also the handler for the database.
 
-Both handlers need to return `Task`, not `IO` as it was in the previous alternative. This change requires some boilerplate to wrap the `IORef` `IO` functions as `Task`. The `Task` is something we introduced and nothing in the Haskell ecosystem will be ready for this right away.
+Both handlers need to return `Task`, not `IO` as it was in the previous alternative. This change requires some boilerplate to wrap the `IORef`'s `IO` functions as `Task`. The `Task` is something we introduced and nothing in the Haskell ecosystem will be ready for this right away.
 
-The `expectConsoleCalls` is almost identicall as before. Just the `IO` and `Task` dance.
+The `expectConsoleCalls` is almost identicall as before. Just a `IO` and `Task` dance that needs to happen.
 
 ```haskell
 data ConsoleTapeEntry = GetStringInput String String | PrintLine String ()
@@ -208,7 +209,7 @@ expectConsoleCalls tape' f = do
   pure res
 ```
 
-Regarding the `ReadOnlyBookDBHandler` we could implement one for testing, but we can also chose use the real one. Accessing the database directly.
+Regarding the `ReadOnlyBookDBHandler` we could implement one for testing, but we can also choose to use the real one. Accessing the database directly.
 
 ```haskell
 main :: IO ()
@@ -246,6 +247,6 @@ main = hspec $ do
         (\c -> main' c rodbh)
 ```
 
-This approach is used in [nri-prelude](https://hackage.haskell.org/package/nri-prelude) where there is a richer `Task` type. There are bunch of additional packages like [nri-redis](https://hackage.haskell.org/package/nri-redis) , [nri-http](https://hackage.haskell.org/package/nri-http), and [nri-postgresql](https://hackage.haskell.org/package/nri-postgresql) that wraps some packages from the ecosystem to work with the handler pattern and `Task`.
+This approach is used in [nri-prelude](https://hackage.haskell.org/package/nri-prelude) where there is a richer `Task` type. There are bunch of additional packages like [nri-redis](https://hackage.haskell.org/package/nri-redis), [nri-http](https://hackage.haskell.org/package/nri-http), and [nri-postgresql](https://hackage.haskell.org/package/nri-postgresql) that wraps some packages from the ecosystem to work with the handler pattern and `Task`.
 
 > [!note] You can find a working copy of this code in `app3` and `app3-test` in [github:bcardiff/lambda-library](https://github.com/bcardiff/lambda-library)
