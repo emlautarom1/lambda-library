@@ -8,7 +8,7 @@ import Eff
 import Main (Console (..), dbBooksRepository, main')
 import Test.Hspec
 
-writerConsole :: [String] -> Eff (Console ::: es) a -> Eff es ([String], a)
+writerConsole :: [String] -> Eff (Console ::: es) a -> Eff es (a, [String])
 writerConsole inputs inner = do
   inputsRef <- liftIO $ newIORef inputs
   outputsRef <- liftIO $ newIORef []
@@ -24,13 +24,13 @@ writerConsole inputs inner = do
           }
   a <- using console $ do inner
   outputs <- liftIO $ reverse <$> readIORef outputsRef
-  return (outputs, a)
+  return (a, outputs)
 
 main :: IO ()
 main = hspec $ do
   around (B.withDB ":memory:") $ do
     it "Showing a message when no books are found" $ \db -> do
-      (output, _) <-
+      (_, output) <-
         runEff
           . using (dbBooksRepository db)
           . use (writerConsole ["Pri", ""])
@@ -52,7 +52,7 @@ main = hspec $ do
             ]
       forM_ books $ B.addBook db
 
-      (output, _) <-
+      (_, output) <-
         runEff
           . using (dbBooksRepository db)
           . use (writerConsole ["en", "or", ""])
