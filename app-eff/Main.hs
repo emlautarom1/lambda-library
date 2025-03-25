@@ -35,18 +35,18 @@ data BooksRepository = BooksRepository
   , _addBook :: forall es. Book -> Eff es ()
   }
 
+findBook :: (BooksRepository :> es) => String -> Eff es [Book]
+findBook query = request >>= \BooksRepository {..} -> _findBook query
+
+addBook :: (BooksRepository :> es) => Book -> Eff es ()
+addBook book = request >>= \BooksRepository {..} -> _addBook book
+
 dbBooksRepository :: BookDB -> BooksRepository
 dbBooksRepository db =
   BooksRepository
     { _findBook = liftIO . db.findBook
     , _addBook = liftIO . db.addBook
     }
-
-findBook :: (BooksRepository :> es) => String -> Eff es [Book]
-findBook query = request >>= \BooksRepository {..} -> _findBook query
-
-addBook :: (BooksRepository :> es) => Book -> Eff es ()
-addBook book = request >>= \BooksRepository {..} -> _addBook book
 
 main :: IO ()
 main = do
