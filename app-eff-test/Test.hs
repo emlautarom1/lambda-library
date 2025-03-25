@@ -14,7 +14,8 @@ writerConsole inputs inner = do
   outputsRef <- liftIO $ newIORef []
   let console =
         Console
-          { _askString = \_ -> liftIO $ do
+          { _askString = \prompt -> liftIO $ do
+              modifyIORef' outputsRef (prompt :)
               (i : is) <- readIORef inputsRef
               modifyIORef' inputsRef (const is)
               return i
@@ -37,7 +38,9 @@ main = hspec $ do
 
       output
         `shouldBe` [ "Welcome to the Library"
+                   , "Search: "
                    , "No books found for: Pri"
+                   , "Search: "
                    , "Bye!"
                    ]
 
@@ -57,8 +60,11 @@ main = hspec $ do
 
       output
         `shouldBe` [ "Welcome to the Library"
+                   , "Search: "
                    , " * Pride and Prejudice, Jane Austen"
                    , " * Frankenstein, Mary Shelley"
+                   , "Search: "
                    , " * 1984, George Orwell"
+                   , "Search: "
                    , "Bye!"
                    ]
